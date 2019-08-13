@@ -1,15 +1,275 @@
-<html>
-  <head>
-    <title>
-      It's not here.
-    </title>
-  </head>
-  <body>
-    <h1>
-      The page is under construction.
-    </h1>
-    <p>The content you're looking for is not here.</p>
-    <p>Please check back later or try other URL.</p>
-  </body>
-</html>
+<html lang="en">
+<meta charset="utf-8">
+<head>
+    <title>Nothing is here.</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            text-align: center;
+        }
 
+        .greetings-container {
+            color: #ffffff;
+            font-family: sans-serif;
+            width: 100%;
+            height: 100%;
+            top: 50%;
+            left: 50%;
+            z-index: 10;
+            transform: translate(-48%, -10%);
+            display: block;
+            position: fixed;
+        }
+        .greetings-title {
+            color: #ffffff;
+            font-size: 3em;
+            font-weight: bold;
+        }
+        .greetings-paragraph {
+            font-size: 1.3em;
+            line-height: 50%;
+        }
+        .greetings-footer {
+            font-size: 0.7em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="greetings-container">
+        <div class="greetings-title" id="title">It's cold here.</div>
+        <div class="greetings-paragraph">
+            <p id="paragraph1">Where has all the content go?</p>
+            <p id="paragraph2">Nobody knows for sure.</p>
+        </div>
+        <div class="greetings-footer" id="footer">2019</div>
+    </div>
+    <canvas class="snow"></canvas>
+    <script>
+        // https://codepen.io/pimskie/pen/jEVPNx
+        var canvas = document.querySelector('.snow'),
+            ctx = canvas.getContext('2d'),
+            windowW = window.innerWidth,
+            windowH = window.innerHeight,
+            numFlakes = 64,
+            flakes = [];
+
+        function Flake(x, y) {
+            var maxWeight = 5,
+                maxSpeed = 3;
+
+            this.x = x;
+            this.y = y;
+            this.r = randomBetween(0, 1);
+            this.a = randomBetween(0, Math.PI);
+            this.aStep = 0.01;
+
+
+            this.weight = randomBetween(2, maxWeight);
+            this.alpha = (this.weight / maxWeight);
+            this.speed = (this.weight / maxWeight) * maxSpeed;
+
+            this.update = function() {
+                this.x += Math.cos(this.a) * this.r;
+                this.a += this.aStep;
+
+                this.y += this.speed;
+            }
+
+        }
+
+        function init() {
+            var i = numFlakes,
+                flake,
+                x,
+                y;
+
+            while (i--) {
+                x = randomBetween(0, windowW, true);
+                y = randomBetween(0, windowH, true);
+
+
+                flake = new Flake(x, y);
+                flakes.push(flake);
+            }
+
+            scaleCanvas();
+            loop();
+        }
+
+        function scaleCanvas() {
+            canvas.width = windowW;
+            canvas.height = windowH;
+        }
+
+        function loop() {
+            var i = flakes.length,
+                z,
+                dist,
+                flakeA,
+                flakeB;
+
+            // clear canvas
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, windowW, windowH);
+            ctx.restore();
+
+            // loop of hell
+            while (i--) {
+
+                flakeA = flakes[i];
+                flakeA.update();
+                ctx.beginPath();
+                ctx.arc(flakeA.x, flakeA.y, flakeA.weight, 0, 2 * Math.PI, false);
+                ctx.fillStyle = 'rgba(255, 255, 255, ' + flakeA.alpha + ')';
+                ctx.fill();
+
+                if (flakeA.y >= windowH) {
+                    flakeA.y = -flakeA.weight;
+                }
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        function randomBetween(min, max, round) {
+            var num = Math.random() * (max - min + 1) + min;
+
+            if (round) {
+                return Math.floor(num);
+            } else {
+                return num;
+            }
+        }
+
+        function distanceBetween(vector1, vector2) {
+            var dx = vector2.x - vector1.x,
+                dy = vector2.y - vector1.y;
+
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        init();
+    </script>
+<!--
+    <script>
+        var lang = navigator.language
+        var browser = navigator.appName
+        console.log(lang);
+        // swedish
+        if (lang.includes("sv") == true) {
+            document.title = "Trevlig helg!";
+            document.getElementById("title").innerHTML = "Trevlig helg!"
+            document.getElementById("paragraph1").innerHTML = "Hälsningar från Göteborg, Sverige";
+            document.getElementById("paragraph2").innerHTML = "Jag är vilse i mina egna tankar...";
+            //Är vi på väg mot den ljusa framtiden, eller försöker vi förgäves försöka förändra det?
+        }
+        // german
+        else if (lang.includes("de") == true) {
+            document.title = "Schöne Ferien!";
+            document.getElementById("title").innerHTML = "Schöne Ferien!"
+            document.getElementById("paragraph1").innerHTML = "Viele Grüße aus Göteborg, Schweden";
+            document.getElementById("paragraph2").innerHTML = "Bleib sicher und frohes neues Jahr!";
+            document.getElementById("footer").innerHTML = "Ich vermisse dich Reinhardt :(";
+        }
+        // danish
+        else if (lang.includes("da") == true) {
+            document.title = "Glædelig jul!";
+            document.getElementById("title").innerHTML = "Glædelig jul!"
+            document.getElementById("paragraph1").innerHTML = "Viele Grüße aus Göteborg, Schweden";
+            document.getElementById("paragraph2").innerHTML = "Tror du på mirakler?";
+        }
+        // czech
+        else if (lang.includes("cs") == true) {
+            document.title = "Šťastné svátky!";
+            document.getElementById("title").innerHTML = "Šťastné svátky!"
+            document.getElementById("paragraph1").innerHTML = "Pozdrav z Göteborgu, Švédsko";
+            document.getElementById("paragraph2").innerHTML = "Přejeme vám šťastný nový rok!";
+        }
+        // norwegian
+        else if (lang.includes("no") == true) {
+            document.title = "God jul!";
+            document.getElementById("title").innerHTML = "God jul!"
+            document.getElementById("paragraph1").innerHTML = "Hilsener fra Göteborg, Sverige";
+            document.getElementById("paragraph2").innerHTML = "Glemte vi noe?";
+        }
+        // norwegian bokmal, I'm unsure if it's different so I'll leave the code here for later
+        else if (lang.includes("nb") == true) {
+            document.title = "God jul!";
+            document.getElementById("title").innerHTML = "God jul!"
+            document.getElementById("paragraph1").innerHTML = "Hilsener fra Göteborg, Sverige";
+            document.getElementById("paragraph2").innerHTML = "Glemte vi noe?";
+        }
+        // norwegian nynorsk, ditto
+        else if (lang.includes("nn") == true) {
+            document.title = "God jul!";
+            document.getElementById("title").innerHTML = "God jul!"
+            document.getElementById("paragraph1").innerHTML = "Hilsener fra Göteborg, Sverige";
+            document.getElementById("paragraph2").innerHTML = "Glemte vi noe?";
+        }
+        // faroese, imperfect translation, but I tried my best
+        else if (lang.includes("fo") == true) {
+            document.title = "Gott nýggjár!";
+            document.getElementById("title").innerHTML = "Gott nýggjár!"
+            document.getElementById("paragraph1").innerHTML = "Halló frá Svøríki";
+            document.getElementById("paragraph2").innerHTML = "Eg kýta seg mín bestur :(";
+        }
+        // polish
+        else if (lang.includes("pl") == true) {
+            document.title = "Wesołych Świąt!";
+            document.getElementById("title").innerHTML = "Wesołych Świąt!"
+            document.getElementById("paragraph1").innerHTML = "Pozdrowienia z Göteborga w Szwecji";
+            document.getElementById("paragraph2").innerHTML = "Szczęśliwego Nowego Roku!";
+            document.getElementById("footer").innerHTML = "Poczekam na rok 2077...Zzzz...";
+        }
+        // russian
+        else if (lang.includes("ru") == true) {
+            document.title = "Счастливых праздников!";
+            document.getElementById("title").innerHTML = "Счастливых праздников!"
+            document.getElementById("paragraph1").innerHTML = "Привет из Гетеборга, Швеция";
+            document.getElementById("paragraph2").innerHTML = "С новым годом!";
+        }
+        // dutch
+        else if (lang.includes("nl") == true) {
+            document.title = "Fijne feestdagen!";
+            document.getElementById("title").innerHTML = "Fijne feestdagen!"
+            document.getElementById("paragraph1").innerHTML = "Groeten uit Gotenburg, Zweden";
+            document.getElementById("paragraph2").innerHTML = "Gelukkig nieuwjaar!";
+        }
+        // finnish
+        else if (lang.includes("fi") == true) {
+            document.title = "Hyvää joulua!";
+            document.getElementById("title").innerHTML = "Hyvää joulua!"
+            document.getElementById("paragraph1").innerHTML = "Terveisiä Göteborgista, Ruotsista";
+            document.getElementById("paragraph2").innerHTML = "Hyvää uutta vuotta!";
+        }
+        // greek
+        else if (lang.includes("el") == true) {
+            document.title = "Καλές διακοπές!";
+            document.getElementById("title").innerHTML = "Καλές διακοπές!"
+            document.getElementById("paragraph1").innerHTML = "Χαιρετισμοί από το Γκέτεμποργκ της Σουηδίας";
+            document.getElementById("paragraph2").innerHTML = "Ευτυχισμένο το νέο έτος!";
+        }
+        // spanish
+        else if (lang.includes("es") == true) {
+            document.title = "¡Feliz Navidad!";
+            document.getElementById("title").innerHTML = "¡Feliz Navidad!"
+            document.getElementById("paragraph1").innerHTML = "Saludos desde Gotemburgo, Suecia";
+            document.getElementById("paragraph2").innerHTML = "¡Feliz año nuevo!";
+        }
+        // icelandic
+        else if (lang.includes("is") == true) {
+            document.title = "Gleðilega hátíð!";
+            document.getElementById("title").innerHTML = "Gleðilega hátíð!"
+            document.getElementById("paragraph1").innerHTML = "Kveðjur frá Gautaborg, Svíþjóð";
+            document.getElementById("paragraph2").innerHTML = "Hamingjusamur Nýtt Ár!";
+        }
+    </script> -->
+</body>
+
+</html>
